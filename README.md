@@ -134,6 +134,11 @@ Nel README (breve), spiega:
 Consigliato: React  
 Libero: puoi usare qualsiasi framework
 
+Puoi anche completare la challenge con HTML, CSS e JavaScript vanilla.
+
+L’obiettivo non è il framework, ma il modo in cui affronti il problema.
+Puoi scegliere il setup più semplice per te.
+
 ---
 
 ## ⏱️ Tempo
