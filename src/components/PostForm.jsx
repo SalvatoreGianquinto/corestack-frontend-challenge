@@ -1,7 +1,7 @@
 "use client"
 
 import api from "@/app/lib/axios"
-import { use, useState } from "react"
+import { useState } from "react"
 
 export default function PostForm({ onPostCreated }) {
   const [title, setTitle] = useState("")

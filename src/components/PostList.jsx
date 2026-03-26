@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import PostCard from "./PostCard"
 import PostForm from "./PostForm"
 
@@ -8,24 +8,41 @@ export default function PostList({ initialPosts }) {
   const [posts, setPosts] = useState(initialPosts)
   const [query, setQuery] = useState("")
   const [showForm, setShowForm] = useState(false)
+  const [visibleCount, setVisibleCount] = useState(8)
 
-  const addPost = (newPost) => {
-    setPosts([newPost, ...posts])
+  const filteredPosts = useMemo(() => {
+    return posts.filter((post) =>
+      post.title.toLowerCase().includes(query.toLowerCase()),
+    )
+  }, [posts, query])
+
+  const currentPosts = useMemo(() => {
+    return filteredPosts.slice(0, visibleCount)
+  }, [filteredPosts, visibleCount])
+
+  const addPost = (newPostData) => {
+    const maxId =
+      posts.length > 0 ? Math.max(...posts.map((p) => Number(p.id))) : 0
+
+    const finalPost = { ...newPostData, id: maxId + 1 }
+
+    setPosts([finalPost, ...posts])
     setShowForm(false)
+    window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
   const deletePost = (id) => {
     if (window.confirm("Vuoi davvero eliminare questo post?")) {
-      setPosts(posts.filter((post) => post.id !== id))
+      setPosts((prev) => prev.filter((post) => post.id !== id))
     }
   }
 
-  const filteredPosts = posts.filter((post) =>
-    post.title.toLowerCase().includes(query.toLowerCase()),
-  )
+  const handleLoadMore = () => {
+    setVisibleCount((prev) => prev + 8)
+  }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 pb-16">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="relative grow max-w-md">
           <input
@@ -33,16 +50,19 @@ export default function PostList({ initialPosts }) {
             placeholder="Cerca tra i post..."
             className="w-full px-5 py-3 border border-slate-200 rounded-2xl focus:ring-2 focus:ring-indigo-500 outline-none transition-all shadow-sm bg-white"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value)
+              setVisibleCount(8)
+            }}
           />
         </div>
 
         <button
           onClick={() => setShowForm(!showForm)}
-          className={`px-6 py-3 rounded-2xl font-bold transition-all shadow-md flex items-center justify-center gap-2 ${
+          className={`px-6 py-3 rounded-2xl font-bold transition-all shadow-md ${
             showForm
-              ? "bg-slate-200 text-slate-700 hover:bg-slate-300"
-              : "bg-indigo-600 text-white hover:bg-indigo-700 active:scale-95"
+              ? "bg-slate-200 text-slate-700"
+              : "bg-indigo-600 text-white hover:bg-indigo-700"
           }`}
         >
           {showForm ? "Annulla" : "＋ Nuovo Post"}
@@ -55,15 +75,13 @@ export default function PostList({ initialPosts }) {
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredPosts.map((post) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        {currentPosts.map((post) => (
           <div key={post.id} className="relative group">
             <PostCard post={post} />
-
             <button
               onClick={() => deletePost(post.id)}
-              className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600 active:scale-90"
-              title="Elimina post"
+              className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-lg hover:bg-red-600"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -84,9 +102,14 @@ export default function PostList({ initialPosts }) {
         ))}
       </div>
 
-      {filteredPosts.length === 0 && (
-        <div className="text-center py-20 text-slate-400">
-          Nessun post trovato per questa ricerca.
+      {visibleCount < filteredPosts.length && (
+        <div className="flex justify-center pt-8">
+          <button
+            onClick={handleLoadMore}
+            className="px-8 py-3 bg-white border-2 border-indigo-600 text-indigo-600 font-bold rounded-2xl hover:bg-indigo-50 transition-all shadow-md active:scale-95"
+          >
+            Carica altri post
+          </button>
         </div>
       )}
     </div>
