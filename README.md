@@ -6,7 +6,7 @@ Scelte e Compromessi
 
 Layout & Paginazione: Ho scelto una griglia a 2 colonne con caricamento progressivo (8 post) per bilanciare pulizia visiva e performance.
 
-ID Numerici Univoci: Ho implementato un sistema incrementale numerico locale per risolvere i conflitti degli ID statici dell'API (101), garantendo key univoche.
+ID Numerici Univoci: Ho implementato un sistema incrementale numerico locale per risolvere i conflitti degli ID statici dell'API (1), garantendo key univoche.
 
 Resilienza: Ho inserito un file error.js per gestire eventuali timeout dell'API, privilegiando la stabilità dello stato locale rispetto alla persistenza (LocalStorage) 
 per mantenere il codice snello.
